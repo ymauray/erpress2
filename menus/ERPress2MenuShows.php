@@ -9,7 +9,7 @@ class ERPress2MenuShows extends WPFPage {
 		global $wpdb;
 		
 		$sql = 'select e.* from ' . ERPress2::$episodes_table . ' e order by publication desc';
-		$data = $wpdb->prepare($sql);
+		$data = $sql;
 		
 		$this->page_header(ERPress2::__('Shows'), array('label' => ERPress2::__('Add'), 'link' => $this->admin_link(null, 'add')));
 		

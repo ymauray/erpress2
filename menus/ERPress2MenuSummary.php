@@ -11,12 +11,10 @@ class ERPress2MenuSummary extends WPFPage {
 		
 		$this->page_header(ERPress2::__('Upcoming shows'), array('label' => ERPress2::__('Add a track'), 'link' => $this->admin_link(null, 'add')));
 		
-		$rows = $wpdb->get_results($wpdb->prepare('select e.* from ' . ERPress2::$episodes_table . ' e where e.archive = false order by publication asc'));
+		$rows = $wpdb->get_results('select e.* from ' . ERPress2::$episodes_table . ' e where e.archive = false order by publication asc');
 		$this->store_uri();
 		foreach ($rows as $row) {
 			$count_row = $wpdb->get_row($wpdb->prepare('select count(*) as count from ' . ERPress2::$tracks_table . ' where episode_id = %d', $row->id));
-			//$data = $wpdb->prepare('select t.*, ar.name as artist, ar.website, al.title as album, al.month, al.year, al.source_link, s.name as source from ' . ERPress2::$tracks_table . ' t, ' . ERPress2::$artists_table . ' ar, ' . ERPress2::$albums_table . ' al, ' . ERPress2::$sources_table . ' s where t.episode_id = %d and ar.id = t.artist_id and al.id = t.album_id and s.id = al.source_id order by t.position asc', $row->id);
-			//$data = $wpdb->prepare('select t.*, ar.name as artist, ar.website, al.title as album, al.month, al.year, al.source_link as al_source_link, s.name as source from ' . ERPress2::$tracks_table . ' t left join ' . ERPress2::$albums_table . ' al on al.id = t.album_id left join ' . ERPress2::$sources_table . ' s on s.id = al.source_id, ' . ERPress2::$artists_table . ' ar where t.episode_id = %d and ar.id = t.artist_id order by t.position asc', $row->id);
 			$data = $wpdb->prepare('select t.*, ar.name as artist, ar.website, al.title as album, al.month, al.year, al.source_link as al_source_link, ifnull(s2.name, s.name) as source from ' . ERPress2::$tracks_table . ' t left join ' . ERPress2::$albums_table . ' al on al.id = t.album_id left join ' . ERPress2::$sources_table . ' s on s.id = al.source_id left join ' . ERPress2::$sources_table . ' s2 on s2.id = t.source_id, ' . ERPress2::$artists_table . ' ar where t.episode_id = %d and ar.id = t.artist_id order by t.position asc', $row->id);
 			echo '<h3>' . $row->name . ' - ' . $row->publication;
 			echo '<a href="' . $this->admin_link(null, 'shownotes', array('id' => $row->id)) . '" class="add-new-h2">' . ERPress2::__('Show notes') . '</a>';
@@ -114,7 +112,6 @@ class ERPress2MenuSummary extends WPFPage {
 	function shownotes() {
 		global $wpdb;
 		
-		//$titres = $wpdb->get_results($wpdb->prepare('select t.*, ar.name as artist, ar.website, ar.twitter, ar.facebook, al.title as album, al.source_id, al.buy_link from ' . ERPress2::$tracks_table . ' t, ' . ERPress2::$artists_table . ' ar, ' . ERPress2::$albums_table . ' al where t.episode_id = %d and ar.id = t.artist_id and al.id = t.album_id order by t.position asc', $_REQUEST['id']));
 		$titres = $wpdb->get_results($wpdb->prepare('select t.*, ar.name as artist, ar.website, ar.twitter, ar.facebook, al.title as album, al.source_id, al.buy_link, al.year from ' . ERPress2::$tracks_table . ' t left join ' . ERPress2::$albums_table . ' al on al.id = t.album_id, ' . ERPress2::$artists_table . ' ar where t.episode_id = %d and ar.id = t.artist_id order by t.position asc', $_REQUEST['id']));
 ?>
 <pre>

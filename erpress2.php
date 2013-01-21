@@ -26,6 +26,7 @@ require('menus/ERPress2MenuShows.php');
 require('menus/ERPress2MenuSummary.php');
 require('menus/ERPress2MenuTracks.php');
 require('menus/ERPress2MenuStats.php');
+require('menus/ERPress2MenuCombined.php');
 
 require('forms/ERPress2FormSummary.php');
 require('forms/ERPress2FormArtist.php');
@@ -161,6 +162,7 @@ class ERPress2 extends WPFPlugin {
 		WPFActions::register_actions($this, 'erpress2-artist', 'ERPress2ActionsArtists', array('edit', 'add', 'delete'));
 		WPFActions::register_actions($this, 'erpress2-album', 'ERPress2ActionsAlbums', array('edit', 'add', 'delete'));
 		WPFActions::register_actions($this, 'erpress2-episode', 'ERPress2ActionsEpisodes', array('edit', 'add', 'delete', 'archive'));
+		WPFActions::register_actions($this, 'erpress2-combined', 'ERPress2ActionsCombined', array('add'));
 		add_action('wp_ajax_artist_combo_action', array('ERPress2ActionsSummary', 'artist_combo_action'));
 		add_action('wp_ajax_album_combo_action', array('ERPress2ActionsSummary', 'album_combo_action'));
 	}
@@ -180,7 +182,7 @@ class ERPress2 extends WPFPlugin {
 		$menu_page->add_submenu_page(self::__('Tracks'), 'tracks', 'ERPress2MenuTracks');
 		$menu_page->add_submenu_page(self::__('Shows'), 'shows', 'ERPress2MenuShows');
 		$menu_page->add_submenu_page(self::__('Stats'), 'stats', 'ERPress2MenuStats');
-		
+		$menu_page->add_submenu_page(self::__('Add track'), 'combined', 'ERPress2MenuCombined');		
 		return $menu;
 	}	
 }

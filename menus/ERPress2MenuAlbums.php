@@ -29,7 +29,7 @@ class ERPress2MenuAlbums extends WPFPage {
 			$data = $wpdb->prepare($sql, $s, $s);
 		}
 		else {
-			$data = $wpdb->prepare($sql);
+			$data = $sql;
 		}
 		
 		$this->page_header(ERPress2::__('Albums'), array('label' => ERPress2::__('Add an album'), 'link' => $this->admin_link(null, 'add')));

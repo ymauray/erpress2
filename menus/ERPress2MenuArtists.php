@@ -12,7 +12,7 @@ class ERPress2MenuArtists extends WPFPage {
 			$data = $wpdb->prepare('select * from ' . ERPress2::$artists_table . ' where name like %s order by name', '%' . $_REQUEST['s'] . '%');
 		}
 		else {
-			$data = $wpdb->prepare('select * from ' . ERPress2::$artists_table . ' order by name');
+			$data = 'select * from ' . ERPress2::$artists_table . ' order by name';
 		}
 		
 		$this->page_header(ERPress2::__('Artists'), array('label' => ERPress2::__('Add'), 'link' => $this->admin_link(null, 'add')));

@@ -13,12 +13,12 @@ class ERPress2FormAlbum extends WPFForm {
 	public function init_fields() {
 		global $wpdb;
 		
-		$rows = $wpdb->get_results($wpdb->prepare('select ar.* from ' . ERPress2::$artists_table . ' ar order by ar.name'));
+		$rows = $wpdb->get_results('select ar.* from ' . ERPress2::$artists_table . ' ar order by ar.name');
 		foreach ($rows as $row) {
 			$artists[] = array('label' => $row->name, 'value' => $row->id);
 		}
 		
-		$rows = $wpdb->get_results($wpdb->prepare('select s.* from ' . ERPress2::$sources_table. ' s order by s.name'));
+		$rows = $wpdb->get_results('select s.* from ' . ERPress2::$sources_table. ' s order by s.name');
 		foreach ($rows as $row) {
 			$sources[] = array('label' => $row->name, 'value' => $row->id);
 		}

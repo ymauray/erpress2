@@ -28,4 +28,20 @@ jQuery(document).ready(function($) {
 			}
 		});
 	})
+
+	$('#erpress2_combined_artist_id').click(function() {
+		var data = {
+			action: 'artist_combo_action',
+			artist_id: this.value
+		};
+		$.post(ajaxurl, data, function(response) {
+			var o = $.parseJSON(response);
+			$('#erpress2_combined_album_id').empty();
+			$('#erpress2_combined_album_id').append('<option value="" selected="selected"></option>');
+			$.each(o, function(key, value) {
+				$('#erpress2_combined_album_id').append('<option value="' + value.id + '">' + value.title + '</option>');
+			});
+			$('#erpress2_combined_album_id').removeAttr('disabled');
+		});
+	});
 });
