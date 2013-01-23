@@ -116,10 +116,6 @@ class ERPress2ActionsCombined extends WPFActions
 	public function add() {
 		global $wpdb;
 
-		echo '<pre>';
-		print_r($this);
-		echo '</pre>';
-
 		if ($this->artist_id == '') {
 			$rows = $wpdb->get_results($wpdb->prepare('select * from ' . ERPress2::$artists_table . ' where soundex(name) like soundex(%s)', $this->artist_name));
 			if (sizeof($rows) > 0) {

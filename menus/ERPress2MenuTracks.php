@@ -15,12 +15,13 @@ class ERPress2MenuTracks extends WPFPage {
 			$s .= $_REQUEST['s'];
 		}
 		$s .= '%';
-		$sql = 'select tr.*, ar.name as artist, ep.name as episode from ' . ERPress2::$tracks_table . ' tr, ' . ERPress2::$artists_table . ' ar, ' . ERPress2::$albums_table . ' al, ' . ERPress2::$episodes_table . ' ep where ar.id = tr.artist_id and al.id = tr.album_id and ep.id = tr.episode_id';
+		$sql = 'select tr.*, ar.name as artist, ep.name as episode, ep.publication, ep.archive from ' . ERPress2::$tracks_table . ' tr, ' . ERPress2::$artists_table . ' ar, ' . ERPress2::$albums_table . ' al, ' . ERPress2::$episodes_table . ' ep where ar.id = tr.artist_id and al.id = tr.album_id and ep.id = tr.episode_id';
 		if ($s != '%%') {
 			$sql .= ' and (ar.name like %s or tr.title like %s)';
 		}
 		$sql .= ' order by artist, title asc';
 		$data = $wpdb->prepare($sql, $s, $s);
+error_log($data);
 		
 		$this->store_uri();
 		$this->display_table(
@@ -35,7 +36,14 @@ class ERPress2MenuTracks extends WPFPage {
 						),
 						'episode' => array(
 								'label' => ERPress2::__('Episode')
-						)
+						),
+						'publication' => array(
+								'label' => ERPress2::__('Publication'),
+								'renderer' => array($this, 'render_publication')
+						),
+						'archive' => array(
+								'label' => ERPress2::__('Archived')
+						),
 				),
 				array(
 						'search_box' => array(
@@ -44,6 +52,15 @@ class ERPress2MenuTracks extends WPFPage {
 				)
 		);
 		$this->page_footer();
+	}
+
+	function render_publication($value, $row) {
+		$now = time();
+		$then = strtotime($value);
+		$html = $value;
+		if ($then > $now) $html = '<b>' . $html . '</b>';
+		else $html = '<i>' . $html . '</i>';
+		return $html;
 	}
 }
 ?>
