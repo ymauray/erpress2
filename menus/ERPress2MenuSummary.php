@@ -15,7 +15,7 @@ class ERPress2MenuSummary extends WPFPage {
 		$this->store_uri();
 		foreach ($rows as $row) {
 			$count_row = $wpdb->get_row($wpdb->prepare('select count(*) as count from ' . ERPress2::$tracks_table . ' where episode_id = %d', $row->id));
-			$data = $wpdb->prepare('select t.*, ar.name as artist, ar.website, al.title as album, al.month, al.year, al.source_link as al_source_link, ifnull(s2.name, s.name) as source from ' . ERPress2::$tracks_table . ' t left join ' . ERPress2::$albums_table . ' al on al.id = t.album_id left join ' . ERPress2::$sources_table . ' s on s.id = al.source_id left join ' . ERPress2::$sources_table . ' s2 on s2.id = t.source_id, ' . ERPress2::$artists_table . ' ar where t.episode_id = %d and ar.id = t.artist_id order by t.position asc', $row->id);
+			$data = $wpdb->prepare('select t.*, ar.name as artist, ar.website, al.title as album, al.month, al.year, al.source_link as al_source_link, ifnull(s2.name, s.name) as source, "" as previous from ' . ERPress2::$tracks_table . ' t left join ' . ERPress2::$albums_table . ' al on al.id = t.album_id left join ' . ERPress2::$sources_table . ' s on s.id = al.source_id left join ' . ERPress2::$sources_table . ' s2 on s2.id = t.source_id, ' . ERPress2::$artists_table . ' ar where t.episode_id = %d and ar.id = t.artist_id order by t.position asc', $row->id);
 			echo '<h3>' . $row->name . ' - ' . $row->publication;
 			echo '<a href="' . $this->admin_link(null, 'shownotes', array('id' => $row->id)) . '" class="add-new-h2">' . ERPress2::__('Show notes') . '</a>';
 			if ($count_row->count >= 8) {
@@ -56,6 +56,10 @@ class ERPress2MenuSummary extends WPFPage {
 							'source' => array(
 									'label' => ERPress2::__('Source'),
 									'renderer' => array($this, 'render_source')
+							),
+							'previous' => array(
+									'label' => ERpress2::__('Previous'),
+									'renderer' => array($this, 'render_previous')
 							)
 					)
 			);
@@ -85,6 +89,21 @@ class ERPress2MenuSummary extends WPFPage {
 		$link = $row->source_link;
 		if ($link == '') $link = $row->al_source_link;
 		return '<a href="' . $link . '">' . $value . '</a>';
+	}
+
+	function render_previous($value, $row) {
+		global $wpdb;
+		$sql = $wpdb->prepare('select e.*, t.title as track_title from ' . ERPress2::$episodes_table . ' e, ' . ERPress2::$tracks_table . ' t where t.artist_id = %d and e.id = t.episode_id and e.id <> %d order by publication asc', $row->artist_id, $row->episode_id);
+		$previous = $wpdb->get_results($sql);
+		$html = '';
+		foreach($previous as $p) {
+			$item = $p->name . ' (' . $p->publication . ')<br/>' . $p->track_title;
+			if (!$p->archive) {
+				$item = '<i><b>' . $item . '</b></i>';
+			}
+			$html .= '<p style="margin-bottom: 1px;">' . $item . '</p>';
+		}	
+		return $html;
 	}
 	
 	function edit() {
@@ -183,6 +202,16 @@ class ERPress2MenuSummary extends WPFPage {
 &lt;p&gt;Fermeture musicale : PeerGynt Lobogris, &lt;a href="http://www.jamendo.com/fr/track/662845/consecuences-of-the-choice"&gt;Consecuences of the Choice&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Introduction et fermeture musicale : Josh Woodward, &lt;a href="http://www.jamendo.com/fr/track/761858/cheapskate-romantic-instrumental-version"&gt;Cheapskate Romantic&lt;/a&gt;&lt;/p&gt;
 
+====================================================================================
+<?php 
+		$first = true;
+		foreach($titres as $titre) {
+			if (!$first) echo ',';
+			echo $titre->artist;
+			$first = false;
+		}
+		echo "\n";
+?>
 ====================================================================================
 <?php
 	$first = true;
