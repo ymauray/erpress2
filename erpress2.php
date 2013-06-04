@@ -184,7 +184,57 @@ class ERPress2 extends WPFPlugin {
 		$menu_page->add_submenu_page(self::__('Stats'), 'stats', 'ERPress2MenuStats');
 		$menu_page->add_submenu_page(self::__('Add track'), 'combined', 'ERPress2MenuCombined');		
 		return $menu;
-	}	
+	}
+
+	public function create_settings_menu($settings) {
+		$settings->pageTitle = self::__('ERPress2 settings');
+		$settings->menuTitle = self::__('ERPress2');
+		$settings->menuSlug = 'erpress2-settings';
+	}
+
+	public function create_settings_form($setting) {
+
+		$setting->group = 'erpress2-settings-group';
+		$setting->name = 'erpress2-settings';
+
+		$section = new stdClass();
+		$section->id = 'erpress2-amped-settings';
+		$section->title = self::__('AMPed API settings');
+		$section->callback = array($this, 'amped_settings_section_callback');
+		$section->menuSlug = 'erpress2-settings-menu';
+
+		$field = new stdClass();
+		$field->id = 'erpress2-amped-url';
+		$field->title = 'API URL';
+		$field->callback = array($this, 'render_amped_url_field');
+		$field->menuSlug = 'erpress2-settings-menu';
+
+		$section->fields[] = $field;
+
+		$setting->sections[] = $section;
+	}
+
+	public function amped_settings_section_callback() {
+		echo 'Some help text goes here.';
+	}
+
+	public function render_amped_url_field() {
+		$setting = esc_attr(get_option('my-setting'));
+    	echo "<input type='text' name='my-setting' value='$setting' />";
+	}
+
+	public function manage_settings() {
+		?>
+<div class="wrap">
+    <h2>My Plugin Options</h2>
+    <form action="options.php" method="POST">
+        <?php settings_fields('erpress2-settings-group'); ?>
+        <?php do_settings_sections('erpress2-settings-menu'); ?>
+        <?php submit_button(); ?>
+    </form>
+</div>
+<?php
+	}
 }
 
 new ERPress2();
