@@ -29,7 +29,15 @@ error_log($data);
 				'id',
 				array(
 						'artist' => array(
-								'label' => ERPress2::__('Artist')
+							'label' => ERPress2::__('Artist'),
+							'menu' => array(
+								'edit' => array(
+									'label' => ERPress2::__('Edit'),
+									'page' => 'summary',
+									'action' => 'edit',
+									'idproperty' => 'id'
+								)
+							)
 						),
 						'title' => array(
 								'label' => ERPress2::__('Title')

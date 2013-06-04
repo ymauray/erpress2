@@ -12,7 +12,7 @@ class ERPress2MenuCombined extends WPFPage {
 		$this->page_header(ERPress2::__('Add a track'));
 
 		$form = new ERPress2FormCombined();
-		$form->render('erpress2_combined_');
+		$form->render('erpress2_add_track_');
 
 		$this->page_footer();
 	}
@@ -58,6 +58,7 @@ class ERPress2FormCombined extends WPFForm {
 		for ($i = 1; $i <= 10; $i++) {
 			$positions[] = array('label' => $i, 'value' => $i);
 		}
+		$positions[] = array('label' => 'Flashback', 'value' => 11);
 		
 		$rows = $wpdb->get_results('select e.*, z.total from ' . ERPress2::$episodes_table . ' e left join (select episode_id, count(*) as total from ' . ERPress2::$tracks_table . ' group by episode_id) z on z.episode_id = e.id where e.archive = false');
 		foreach ($rows as $row) {

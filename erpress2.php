@@ -186,50 +186,45 @@ class ERPress2 extends WPFPlugin {
 		return $menu;
 	}
 
-	public function create_settings_menu($settings) {
-		$settings->pageTitle = self::__('ERPress2 settings');
+	public function get_settings_config($settings) {
+		$settings->group = 'erpress2-settings-group';
+		$settings->name = 'erpress2-settings';
+		$settings->menuSlug = 'erpress2-plugin';
 		$settings->menuTitle = self::__('ERPress2');
-		$settings->menuSlug = 'erpress2-settings';
+		$settings->renderCallback = array($this, 'settings_render_form');
+
+		$section = $this->create_settings_section('erpress2-settings-amped-section', self::__('AMPed API settings'), array($this, 'settings_amped_section'));
+
+		$section->fields[] = $this->create_settings_field('erpress2-amped-url', 'API URL', function() {
+			$settings = (array) get_option('erpress2-settings');
+			$url = esc_attr(isset($settings['url']) ? $settings['url'] : '');
+	    	echo "<input type='text' name='erpress2-settings[url]' value='$url' size='60'/>";
+		});
+		$section->fields[] = $this->create_settings_field('erpress2-amped-pubkey', 'Public key', function() {
+			$settings = (array) get_option('erpress2-settings');
+			$pubkey = esc_attr(isset($settings['pubkey']) ? $settings['pubkey'] : '');
+			echo "<input type='text' name='erpress2-settings[pubkey]' value='$pubkey' size='60'/>";
+		});
+		$section->fields[] = $this->create_settings_field('erpress2-amped-privkey', 'Private key', function() {
+			$settings = (array) get_option('erpress2-settings');
+			$privkey = esc_attr(isset($settings['privkey']) ? $settings['privkey'] : '');
+			echo "<input type='text' name='erpress2-settings[privkey]' value='$privkey' size='60'/>";
+		});
+
+		$settings->sections[] = $section;
 	}
 
-	public function create_settings_form($setting) {
+	public function settings_amped_section() {
 
-		$setting->group = 'erpress2-settings-group';
-		$setting->name = 'erpress2-settings';
-
-		$section = new stdClass();
-		$section->id = 'erpress2-amped-settings';
-		$section->title = self::__('AMPed API settings');
-		$section->callback = array($this, 'amped_settings_section_callback');
-		$section->menuSlug = 'erpress2-settings-menu';
-
-		$field = new stdClass();
-		$field->id = 'erpress2-amped-url';
-		$field->title = 'API URL';
-		$field->callback = array($this, 'render_amped_url_field');
-		$field->menuSlug = 'erpress2-settings-menu';
-
-		$section->fields[] = $field;
-
-		$setting->sections[] = $section;
 	}
 
-	public function amped_settings_section_callback() {
-		echo 'Some help text goes here.';
-	}
-
-	public function render_amped_url_field() {
-		$setting = esc_attr(get_option('my-setting'));
-    	echo "<input type='text' name='my-setting' value='$setting' />";
-	}
-
-	public function manage_settings() {
+	public function settings_render_form() {
 		?>
 <div class="wrap">
-    <h2>My Plugin Options</h2>
+    <h2>ERPress2 options</h2>
     <form action="options.php" method="POST">
         <?php settings_fields('erpress2-settings-group'); ?>
-        <?php do_settings_sections('erpress2-settings-menu'); ?>
+        <?php do_settings_sections('erpress2-plugin'); ?>
         <?php submit_button(); ?>
     </form>
 </div>

@@ -32,6 +32,7 @@ class ERPress2FormSummary extends WPFForm {
 		for ($i = 1; $i <= 10; $i++) {
 			$options[] = array('label' => $i, 'value' => $i);
 		}
+		$options[] = array('label' => 'Flashback', 'value' => 11);
 		
 		$rows = $wpdb->get_results($wpdb->prepare('select e.*, z.total from ' . ERPress2::$episodes_table . ' e left join (select episode_id, count(*) as total from ' . ERPress2::$tracks_table . ' group by episode_id) z on z.episode_id = e.id where e.archive = false'));
 		foreach ($rows as $row) {

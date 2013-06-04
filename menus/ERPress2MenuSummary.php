@@ -28,6 +28,7 @@ class ERPress2MenuSummary extends WPFPage {
 					array(
 							'position' => array(
 									'label' => ERPress2::__('Position'),
+									'renderer' => array($this, 'render_position'),
 									'menu' => array(
 											'edit' => array(
 													'label' => ERPress2::__('Edit')
@@ -68,6 +69,10 @@ class ERPress2MenuSummary extends WPFPage {
 		$this->page_footer();
 	}
 	
+	function render_position($value, $row) {
+		return ($value == 11) ? "Flashback" : $value;
+	}
+
 	function render_artist($value, $row) {
 		return '<a href="' . $row->website . '">' . $value . '</a>';
 	}
@@ -150,6 +155,7 @@ class ERPress2MenuSummary extends WPFPage {
 <?php 
 		$sources = Array();
 		foreach($titres as $titre) {
+			if ($titre->position == 11) break;
 			if ($titre->website != '') {
 				$artist = '&lt;a href="' . $titre->website . '"&gt;' . $titre->artist . '&lt;/a&gt;';
 			}
@@ -183,6 +189,44 @@ class ERPress2MenuSummary extends WPFPage {
 	}
 ?>
 &lt;/ul&gt;
+
+<?php
+	foreach($titres as $titre) {
+		if ($titre->position == 11) {
+                        if ($titre->website != '') {
+                                $artist = '&lt;a href="' . $titre->website . '"&gt;' . $titre->artist . '&lt;/a&gt;';
+                        }
+                        else {
+                                $artist = $titre->artist;
+                        }
+
+                        if ($titre->album != '') {
+                                $lien = '&lt;span style="font-style: oblique;"&gt;' . $titre->album . '&lt;/span&gt;';
+                                $sources[$titre->source_id] = true;
+                                if ($titre->buy_link != null) {
+                                        $titre->buy_link = trim($titre->buy_link);
+                                        if (substr($titre->buy_link, 0, 7) == "<a href") {
+                                                //$lien = '&lt;a style="font-style: oblique;" ' . str_replace("&", "&amp;", str_replace('border="0" alt', 'alt', substr($titre->buy_link, 3)));
+                                                $lien = '&lt;a style="font-style: oblique;" ' . str_replace("<", "&lt;", str_replace('border="0" alt', 'alt', substr($titre->buy_link, 3)));
+                                        }
+                                        else {
+                                                $lien = '&lt;a style="font-style: oblique;" href="' . $titre->buy_link . '"&gt;' . $titre->album . '&lt;/a&gt;';
+                                        }
+                                }
+                                if (($titre->year != '') && ($titre->year > 0)) {
+                                        $lien .= ', ' . $titre->year;
+                                }
+                        }
+                        else {
+                                $lien = '';
+                        }
+?>
+&lt;b&gt;Flashback&lt;/b&gt; : <?php echo $artist; ?> - <?php echo $titre->title; ?><?php if ($lien != '') { echo ' (' . $lien . ')'; } ?>
+<?php
+		}
+	}
+?>
+
 
 &lt;p&gt;Contacts : Par mail à &lt;b&gt;info @ euterpia-radio . fr&lt;/b&gt;, &lt;a href="http://twitter.com/euterpiaradio"&gt;@euterpiaradio&lt;/a&gt; sur twitter, ou notre page &lt;a href="http://www.facebook.com/euterpiaradio"&gt;Facebook&lt;/a&gt;&lt;/p&gt;
 
@@ -223,6 +267,19 @@ class ERPress2MenuSummary extends WPFPage {
 		}
 	}
 	echo "\n";
+?>
+====================================================================================
+<?php
+	$first = true;
+	echo 'update wp_erpress2_artists set mm = now() where twitter in (';
+	foreach($titres as $titre) {
+		if ($titre->twitter != '') {
+			if (!$first) echo ', ';
+			$first = false;
+			echo '"' . $titre->twitter . '"';
+		}
+	}
+	echo ")\n";
 ?>
 ====================================================================================
 <?php
