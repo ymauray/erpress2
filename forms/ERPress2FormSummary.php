@@ -1,4 +1,5 @@
 <?php
+
 class ERPress2FormSummary extends WPFForm {
 	
 	public $id;
@@ -72,6 +73,103 @@ class ERPress2FormSummary extends WPFForm {
 			$this->add_field(array('type' => 'combo', 'label' => ERPress2::__('Episode'), 'property' => 'episode_id', 'options' => $episodes));
 			$this->add_field(array('type' => 'combo', 'label' => ERPress2::__('Position'), 'property' => 'position', 'options' => $options));
 		}
+	}
+}
+
+class ERPress2FormSubmitToAMPed extends WPFForm {
+
+	public $podcast;
+	public $show;
+	public $artist;
+	public $title;
+	public $website;
+	public $url;
+	public $shownotes;
+	public $twitter;
+	public $facebook;
+	public $host;
+	public $episode_name;
+
+	public function init_fields() {
+		$client = new AMPedClient();
+
+		$fromRock = (stristr($this->episode_name, 'rock') != false);
+
+		$podcasts = array();
+		$client->query('amped.myPodcasts');
+		$response = $client->getResponse();
+		foreach ($response['podcasts'] as $podcast) {
+			$podcasts[] = array('label' => $podcast['title'], 'value' => $podcast['id']);
+			$ids[(stristr($podcast['title'], 'rock') === false) ? 0:1] = $podcast['id'];
+		}
+		$this->podcast = $ids[$fromRock ? 1:0];
+
+		$shows = array();
+//		$client->debug = true;
+		$client->query('amped.upcomingShows');
+		$response = $client->getResponse();
+		foreach ($response['shows'] as $show) {
+			$shows[] = array('label' => 'AMPed #' . $show['number'] . ' (' . $show['host'] . ') (' . sizeof($show['tracks']) . ')', 'value' => $show['number']);
+			if ($this->show == NULL) {
+				if (sizeof($show['tracks']) == 0) {
+					$this->show = $show['number'];
+				}
+				else {
+					$found = false;
+					foreach ($show['tracks'] as $track) {
+						if ($track['podcast'] == $this->podcast) {
+							$found = true;
+						}
+					}
+					if (!$found) {
+						$this->show = $show['number'];
+					}
+				}
+			}
+		}
+
+		$this->add_field(array('type' => 'combo', 'label' => ERPress2::__('Podcast'), 'property' => 'podcast', 'options' => $podcasts, 'mandatory' => true));
+		$this->add_field(array('type' => 'combo', 'label' => ERPress2::__('AMPed show'), 'property' => 'show', 'options' => $shows, 'mandatory' => true));
+		$this->add_field(array('type' => 'text', 'property' => 'artist', 'label' => ERPress2::__('Artist'), 'readonly' => true));
+		$this->add_field(array('type' => 'text', 'property' => 'title', 'label' => ERPress2::__('Title'), 'readonly' => true));
+		$this->add_field(array('type' => 'text', 'property' => 'website', 'label' => ERPress2::__('Website'), 'readonly' => true));
+		$this->add_field(array('type' => 'url', 'property' => 'url', 'label' => ERPress2::__('URL'), 'mandatory' => true));
+		$this->add_field(array('type' => 'textarea', 'property' => 'notes', 'label' => ERPress2::__('Notes for the site<br/><span class="input-helper"><span class="shownotes-counter"></span> character(s) left</span>'), 'mandatory' => true));
+		$this->add_field(array('type' => 'twitter', 'property' => 'twitter', 'label' => ERPress2::__('Twitter')));
+		$this->add_field(array('type' => 'url', 'property' => 'facebook', 'label' => ERPress2::__('Facebook')));
+		$this->add_field(array('type' => 'textarea', 'property' => 'host', 'label' => ERPress2::__('Notes for the host')));
+
+		$this->set_submit_label(ERPress2::__('Submit track to AMPed'));
+		$this->set_action('erpress2-amped-submit');
+	}
+}
+
+class ERPress2ActionsSubmitToAMPed extends WPFActions {
+
+	public $podcast;
+	public $show;
+	public $artist;
+	public $title;
+	public $website;
+	public $url;
+	public $notes;
+	public $twitter;
+	public $facebook;
+	public $host;
+
+	function submit() {
+		$client = new AMPedClient();
+		$client->query('amped.submitTrack', $this);
+		$response = $client->getResponse();
+
+		if ($response['status'] == 'ok') {
+			ERPress2::add_message(ERPress2::__($response['message']));
+		}
+		else {
+			ERPress2::add_error(ERPress2::__($response['message']));
+		}
+		
+		$this->redirect_to_referer();
 	}
 }
 ?>

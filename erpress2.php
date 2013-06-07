@@ -19,24 +19,24 @@ License: GPL (http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 require_once(WP_PLUGIN_DIR . '/WPF/WPF.php');
+require_once('AMPedClient.php');
+require_once('menus/ERPress2MenuArtists.php');
+require_once('menus/ERPress2MenuAlbums.php');
+require_once('menus/ERPress2MenuShows.php');
+require_once('menus/ERPress2MenuSummary.php');
+require_once('menus/ERPress2MenuTracks.php');
+require_once('menus/ERPress2MenuStats.php');
+require_once('menus/ERPress2MenuCombined.php');
 
-require('menus/ERPress2MenuArtists.php');
-require('menus/ERPress2MenuAlbums.php');
-require('menus/ERPress2MenuShows.php');
-require('menus/ERPress2MenuSummary.php');
-require('menus/ERPress2MenuTracks.php');
-require('menus/ERPress2MenuStats.php');
-require('menus/ERPress2MenuCombined.php');
+require_once('forms/ERPress2FormSummary.php');
+require_once('forms/ERPress2FormArtist.php');
+require_once('forms/ERPress2FormAlbum.php');
+require_once('forms/ERPress2FormEpisode.php');
 
-require('forms/ERPress2FormSummary.php');
-require('forms/ERPress2FormArtist.php');
-require('forms/ERPress2FormAlbum.php');
-require('forms/ERPress2FormEpisode.php');
-
-require('actions/ERPress2ActionsSummary.php');
-require('actions/ERPress2ActionsArtists.php');
-require('actions/ERPress2ActionsAlbums.php');
-require('actions/ERPress2ActionsEpisodes.php');
+require_once('actions/ERPress2ActionsSummary.php');
+require_once('actions/ERPress2ActionsArtists.php');
+require_once('actions/ERPress2ActionsAlbums.php');
+require_once('actions/ERPress2ActionsEpisodes.php');
 
 class ERPress2 extends WPFPlugin {
 	
@@ -163,6 +163,7 @@ class ERPress2 extends WPFPlugin {
 		WPFActions::register_actions($this, 'erpress2-album', 'ERPress2ActionsAlbums', array('edit', 'add', 'delete'));
 		WPFActions::register_actions($this, 'erpress2-episode', 'ERPress2ActionsEpisodes', array('edit', 'add', 'delete', 'archive'));
 		WPFActions::register_actions($this, 'erpress2-combined', 'ERPress2ActionsCombined', array('add'));
+		WPFActions::register_actions($this, 'erpress2-amped', 'ERPress2ActionsSubmitToAMPed', array('submit'));
 		add_action('wp_ajax_artist_combo_action', array('ERPress2ActionsSummary', 'artist_combo_action'));
 		add_action('wp_ajax_album_combo_action', array('ERPress2ActionsSummary', 'album_combo_action'));
 	}

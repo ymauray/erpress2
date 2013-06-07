@@ -3,7 +3,7 @@
 class ERPress2MenuSummary extends WPFPage {
 	
 	function __construct($plugin) {
-		parent::__construct($plugin, array('edit', 'add', 'shownotes'));
+		parent::__construct($plugin, array('edit', 'add', 'shownotes', 'submit'));
 	}
 	
 	function default_page() {
@@ -32,6 +32,9 @@ class ERPress2MenuSummary extends WPFPage {
 									'menu' => array(
 											'edit' => array(
 													'label' => ERPress2::__('Edit')
+											),
+											'submit' => array(
+												'label' => ERPress2::__('Submit to AMPed')
 											),
 											'delete' => array(
 													'label' => ERPress2::__('Delete'),
@@ -123,6 +126,24 @@ class ERPress2MenuSummary extends WPFPage {
 		$this->page_header(ERPress2::__('Edit track'));
 		$form = new ERPress2FormSummary($row);
 		$form->render();
+		$this->page_footer();
+	}
+
+	function submit() {
+		global $wpdb;
+
+		$query = $wpdb->prepare('select a.name as artist, t.title, a.website, a.twitter, a.facebook, e.name as episode_name from ' . ERPress2::$tracks_table . ' t, ' . ERPress2::$artists_table . ' a, ' . ERPress2::$episodes_table . ' e where t.id = %d and a.id = t.artist_id and e.id = t.episode_id', $_REQUEST['id']);
+		$row = $wpdb->get_row($query);
+
+		$this->page_header(ERPress2::__('Submit to AMPed'));
+		$settings = (array) get_option('erpress2-settings');
+		if (!isset($settings) || ($settings == null) || !isset($settings['url']) || !isset($settings['pubkey']) || !isset($settings['privkey'])) {
+			echo 'The AMPed API settings were not found.';
+		}
+		else {
+			$form = new ERPress2FormSubmitToAMPed($row);
+			$form->render();
+		}
 		$this->page_footer();
 	}
 	

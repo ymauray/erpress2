@@ -44,4 +44,25 @@ jQuery(document).ready(function($) {
 			$('#erpress2_combined_album_id').removeAttr('disabled');
 		});
 	});
+
+	if ($('#notes').length > 0) {
+		shownotesMaxSize = 450;
+		shownotesAlertThreshold = 50;
+		$('.shownotes-counter').text(shownotesMaxSize - $("#notes").val().length);
+		$('#notes').keyup(function() {
+			var t = $("#notes").val();
+			if (t.length > shownotesMaxSize) {
+				t = t.substring(0, shownotesMaxSize);
+				$('#notes').val(t);
+			}
+			$('.shownotes-counter').text(shownotesMaxSize - t.length);
+			if ((shownotesMaxSize - t.length) <= shownotesAlertThreshold) {
+				$('.shownotes-counter').addClass('error');
+			}
+			else {
+				$('.shownotes-counter').removeClass('error');
+			}
+		});
+	}
+
 });
